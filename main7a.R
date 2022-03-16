@@ -10,8 +10,9 @@ library(dplyr)
 # library(glmnet)
 library(tidyr)
 # library(e1071)
-library(R.matlab)
+# library(R.matlab)
 library(ggdendro)
+library(corrplot)
 
 ## Loading data
 rm(list = ls()) # Clear
@@ -53,3 +54,20 @@ pa<-Xscaled_t%>%
   hclust(method = "average")%>%
   ggdendrogram()+
   labs(title="Average")
+
+
+## Experiments
+
+dend<-t(Xscaled_t)%>%
+  dist()%>%
+  hclust(method = "complete")%>%
+  as.dendrogram()
+
+dend_data <- dendro_data(dend, type = "rectangle")
+
+grp<-y
+
+ggplot(dend_data$segments) + 
+  geom_segment(aes(x = x, y = y, xend = xend, yend = yend))+
+  geom_text(data = dend_data$labels, aes(x, y, label = label,color=grp),
+            hjust = 1, angle = 90, size = 3)
