@@ -2,3 +2,6 @@
 .Rhistory
 .RData
 .Ruserdata
+
+.mat
+.csv
