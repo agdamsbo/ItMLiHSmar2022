@@ -3,5 +3,5 @@
 .RData
 .Ruserdata
 
-.mat
-.csv
+*.mat
+*.csv
