@@ -34,8 +34,8 @@ cMatTrain<-cMatTest<-table(factor(c(0,0),levels=catinfo),factor(c(0,0),levels=ca
 for (idx1 in 1:K){
   # idx1=2
   # Get training- and test sets
-  I_train = 1:length(y) %in% c[[idx1]] ## Creating selection vector of TRUE/FALSE
-  I_test = !I_train
+  I_test = 1:length(y) %in% c[[idx1]] ## Creating selection vector of TRUE/FALSE
+  I_train = !I_test
   #
   Xtrain = X[I_train]
   ytrain = y[I_train]

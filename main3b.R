@@ -43,7 +43,7 @@ for (idx1 in 1:K){
   
   # idx1=1
   # Get training- and test sets
-  I_train = c==idx1 ## Creating selection vector of TRUE/FALSE
+  I_train = c!=idx1 ## Creating selection vector of TRUE/FALSE
   I_test = !I_train
   
   Xtrain = X[I_train,]

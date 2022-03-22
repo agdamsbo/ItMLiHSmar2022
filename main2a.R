@@ -32,8 +32,8 @@ c<-createDataPartition(
 )
 
 # Partitioning
-I_train = 1:length(y) %in% c ## Creating selection vector of TRUE/FALSE
-I_test = !I_train
+I_test = 1:length(y) %in% c ## Creating selection vector of TRUE/FALSE
+I_train = !I_test
 #
 Xtrain = X[I_train]
 ytrain = y[I_train]

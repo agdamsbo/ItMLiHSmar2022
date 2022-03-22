@@ -27,7 +27,7 @@ set.seed(231)
 c<-createFolds(y=y, k = K, list = FALSE, returnTrain = TRUE) # Using this function to ensure both levels represented in alle folds
 
 # Setting budget Cost
-Cost<-2^seq(-5, 15, 1)
+Cost<-2^seq(-20, 20, 1)
 
 B<-list()
 
@@ -43,7 +43,7 @@ for (idx1 in 1:K){
   
   # idx1=1
   # Get training- and test sets
-  I_train = c==idx1 ## Creating selection vector of TRUE/FALSE
+  I_train = c!=idx1 ## Creating selection vector of TRUE/FALSE
   I_test = !I_train
   
   Xtrain = X[I_train,]
@@ -53,17 +53,26 @@ for (idx1 in 1:K){
   
   # Matrix for keeping coef.s
   mat<-c()
+  
+  ## Standardising / scaling
+  Xtrain<-scale(Xtrain,center=TRUE,scale=TRUE)
+  Xtest<-scale(Xtest,center=TRUE,scale=TRUE)
+  
+  ds<-data.frame(cbind(y=ytrain,Xtrain))%>%mutate(y=factor(y,labels=catinfo))
+  
   # Iterate over regularization strengths to compute training- and test
   # errors for individual regularization strengths.
   for (idx2 in 1:length(Cost)){
     # idx2=1
     
-    mod<-svm(ytrain ~ ., 
-             data = data.frame(ytrain,Xtrain),
+    
+    mod<-svm(y ~ ., 
+             data = ds,
              kernel = "linear", 
-             cost = 1/Cost[idx2], ## !/C as in the original script.
-             scale=TRUE,  ## The model scales the input
-             probability=TRUE)
+             cost = 1/Cost[idx2], ## 1/C as in the original script
+             scale=FALSE,  ## The is scaled
+             probability=TRUE,
+             tolerance=1e-1)
     
     ## Keeping coefficients
     beta<-coef(mod) #
@@ -77,15 +86,11 @@ for (idx1 in 1:K){
     
     # Predictions
     yhatTrainProb<-predict(mod,
-                           newdata = scale(Xtrain, ## Scaling data for prediction
-                                           center = TRUE, 
-                                           scale = TRUE)
+                           newdata = Xtrain
     )
     
     yhatTestProb<-predict(mod,
-                          newdata = scale(Xtest, ## Scaling data for prediction
-                                          center = TRUE, 
-                                          scale = TRUE)
+                          newdata = Xtest
     )
     
     # To keep the naming scheme
@@ -120,7 +125,7 @@ p20f<-ggplot()+
   labs(title = "Classification by C",
        subtitle = "Checkpoint 20",
        color = "Model")+
-  ylab("MSE")+
+  ylab("error rate")+
   xlab(bquote(log[2](C)))
 
 # Number of support vectors
@@ -130,7 +135,7 @@ p20i<-ggplot(aes(x=llog,y=nSVPlot, color="blue"), data=data.frame(llog,nSVPlot))
   labs(title = "Classification by C",
        subtitle = "Checkpoint 20",
        color = "Model")+
-  ylab("number of support vectors")+
+  ylab("mean number of support vectors")+
   xlab(bquote(log[2](C)))
 
 # Beta array manipulation

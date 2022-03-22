@@ -56,7 +56,7 @@ pa<-Xscaled_t%>%
   labs(title="Average")
 
 
-## Experiments
+## Experiments for coloring by outcome label
 
 dend<-t(Xscaled_t)%>%
   dist()%>%
@@ -65,9 +65,11 @@ dend<-t(Xscaled_t)%>%
 
 dend_data <- dendro_data(dend, type = "rectangle")
 
-grp<-y
+grp<-tibble(label=as.character(1:100),
+            y=y)
+labs<-left_join(dend_data$labels,grp,by=c("label"))
 
 ggplot(dend_data$segments) + 
   geom_segment(aes(x = x, y = y, xend = xend, yend = yend))+
-  geom_text(data = dend_data$labels, aes(x, y, label = label,color=grp),
+  geom_text(data = dend_data$labels, aes(x, y, label = label,color=labs$y.y),
             hjust = 1, angle = 90, size = 3)

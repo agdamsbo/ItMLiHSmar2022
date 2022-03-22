@@ -42,3 +42,8 @@ p28c<-tibble(sds=apply(X, 2, sd),
   labs(title = "Barplot of feature SDs")+
   ylab("Standard Deviation")+
   xlab("Features (First eight letters)")
+
+
+pca<-prcomp(X, scale = TRUE)
+biplot(pca, scale = 0)
+

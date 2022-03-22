@@ -55,6 +55,22 @@ p4f<-ggplot() +
   ylab("density D")+
   scale_color_discrete(labels = c("fit line","test","train"))
 
+for (k in 1:7){
+  # k=1
+  
+  # Train linear regression model
+  fit<-lm(y~poly(x,k),data=data.frame(x=XtrainPol,y=ytrain))
+  ## Data frame is defined to secure consistent naming as moving forward
+  
+  # Use model to predict
+  yhatTrain = predict(fit,data.frame(x=XtrainPol))
+  yhatTest = predict(fit,data.frame(x=XtestPol))
+  
+  # Compute training and test error
+  errTrain[k] = mean((ytrain-yhatTrain)^2)
+  errTest[k] = mean((ytest-yhatTest)^2)
+}
+
 ## MSE plot
 ## This is not plotting correctly!!
 p4g<-ggplot()+
@@ -69,42 +85,36 @@ p4g<-ggplot()+
 
 ## 7 plots
 
-scl = sd(XtrainPol)
-XtrainPol = XtrainPol/scl
-XtestPol = XtestPol/scl
-XhighResPol = XhighResPol/scl
-
 ## Fit points for 7 orders
-multiplot<-function(K){
+# https://stackoverflow.com/questions/39799886/r-assigning-ggplot-objects-to-list-in-loop
+multiplot<-function(k){
+  errTrain<-errTest<-c()
   
-  for (k in K){
-    # k=1
-    
-    # Train linear regression model
-    fit<-lm(y~poly(x,k),data=data.frame(x=XtrainPol,y=ytrain))
-    ## Data frame is defined to secure consistent naming as moving forward
-    
-    # Use model to predict
-    yhatTrain = predict(fit,data.frame(x=XtrainPol))
-    yhatTest = predict(fit,data.frame(x=XtestPol))
-    
-    # Compute training and test error
-    errTrain[k] = mean((ytrain-yhatTrain)^2)
-    errTest[k] = mean((ytest-yhatTest)^2)
-    
-    p<-ggplot() + 
-      ylim(min(c(ytest,ytrain)),max(c(ytest,ytrain)))+ # Limits set to keep data points in "focus"
-      geom_point(aes(x=XtrainPol, y=ytrain, color="red")) +
-      geom_point(aes(x=XtestPol, y=ytest, color="green")) +
-      geom_line(aes(x=XhighResPol, y=predict(fit,data.frame(x=XhighResPol)), color="blue")) +
-      labs(title = paste0("Model: k=",k),
-           color = "Model")+
-      xlab("Chest circumference")+
-      ylab("density D")+
-      scale_color_discrete(labels = c("fit line","test","train"))
-  }
+  # Train linear regression model
+  fit<-lm(y~poly(x,k),data=data.frame(x=XtrainPol,y=ytrain))
+  
+  ## Data frame is defined to secure consistent naming as moving forward
+  # Use model to predict
+  yhatTrain = predict(fit,data.frame(x=XtrainPol))
+  yhatTest = predict(fit,data.frame(x=XtestPol))
+  
+  # Compute training and test error
+  errTrain[k] = mean((ytrain-yhatTrain)^2)
+  errTest[k] = mean((ytest-yhatTest)^2)
+  
+  p<-ggplot() + 
+    ylim(min(c(ytest,ytrain)),max(c(ytest,ytrain)))+ # Limits set to keep data points in "focus"
+    geom_point(aes(x=XtrainPol, y=ytrain, color="red")) +
+    geom_point(aes(x=XtestPol, y=ytest, color="green")) +
+    geom_line(aes(x=XhighResPol, y=predict(fit,data.frame(x=XhighResPol)), color="blue")) +
+    labs(title = paste0("Model: k=",k),
+         color = "Model")+
+    xlab("Chest circumference")+
+    ylab("density D")+
+    scale_color_discrete(labels = c("fit line","test","train"))
+  
   return(p)
 }
 
-myplots <- lapply(1:7, multiplot)
-
+p4f <- lapply(1:7, multiplot)
+# wrap_plots(p4f)
