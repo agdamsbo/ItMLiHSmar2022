@@ -45,5 +45,5 @@ p28c<-tibble(sds=apply(X, 2, sd),
 
 
 pca<-prcomp(X, scale = TRUE)
-biplot(pca, scale = 0)
+biplot<-biplot(pca, scale = 0)
 

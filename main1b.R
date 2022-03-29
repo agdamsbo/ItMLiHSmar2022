@@ -4,6 +4,7 @@
 
 ## Loading libraries
 library(R.matlab)
+library(caret)
 
 ## Loading data
 
